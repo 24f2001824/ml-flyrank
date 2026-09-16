@@ -17,9 +17,16 @@ The unit of analysis is a page. The output is a ranked list of pages with a refr
 The cost of a wrong call is asymmetric. Prioritizing a page that does not need attention can waste editorial time, while failing to prioritize a page that warrants review can result in a missed improvement opportunity.
 
 Data and machine learning are useful because the dataset contains multiple observable signals related to visibility, content characteristics, freshness, and engagement. Combining these signals into a ranking can provide a consistent decision-support tool rather than relying only on a single manually selected rule.
+
 ## 2. Data safety
 
-The analysis uses an anonymized FlyRank content-refresh dataset containing 30,000 page-level records and 44 original columns. The unit of analysis is a page, and the model uses observable content, visibility, freshness, and engagement signals.
+This analysis uses the anonymized starter dataset `content_refresh_anonymized.csv`, containing 30,000 page-level records and 44 original columns. The analysis was performed on the page-level starter dataset rather than directly querying the full warehouse release.
+
+The available performance signals include 90-day and 30-day aggregate windows, along with content, visibility, freshness, and engagement features.
+
+For modeling, I used 21 features covering search demand, content size, visibility, freshness, CTR, position, engagement, and traffic signals. I excluded `trend_direction` because it was used to define the target, `trend_pct` because it contains direct trend information, and `content_id` and `client_id` because they are identifiers/grouping fields rather than predictive content signals.
+
+No client names, domains, private queries, credentials, or raw private exports are exposed in this paper.
 
 The final model uses 21 features:
 
@@ -121,23 +128,24 @@ The results give useful direction for prioritizing review, but there are some li
 
 ## 8. Reproducibility
 
-I kept the main analysis in the capstone notebook so that the steps can be followed and run again from the notebook. The notebook is available in the `work/notebooks/` folder of the repository.
+I kept the main analysis in the capstone notebook so that the steps can be followed and run again from the notebook. The complete repository contains the supporting assignment work, the capstone notebook, and the deployed paper.
 
-The analysis uses `random_state=42` for the train/test split and the Random Forest model. I used a client-level split with `GroupShuffleSplit`, so pages from the same client do not appear in both the training and test sets.
+- **Repository:** https://github.com/24f2001824/ml-flyrank
+- **Capstone notebook:** https://github.com/24f2001824/ml-flyrank/blob/main/work/notebooks/capstone.ipynb
 
 The main steps to reproduce the analysis are:
 
 1. Clone the repository.
 2. Open `work/notebooks/capstone.ipynb`.
-3. Make sure the FlyRank dataset is available at the expected data path.
+3. Make sure the anonymized FlyRank dataset is available at `data/raw/content_refresh_anonymized.csv`.
 4. Run the notebook from top to bottom.
 5. The notebook loads the data, creates the target, checks for leakage, creates the baseline, trains the Random Forest model, evaluates both methods, and generates the ranked recommendations.
 
 The main Python libraries used include pandas, numpy, scikit-learn, matplotlib, and seaborn.
 
-The random seed and split settings are kept fixed so that the main evaluation can be reproduced using the same data and setup.
+The random seed is fixed at `42` for the train/test split and the Random Forest model. I used a client-level split with `GroupShuffleSplit`, so pages from the same client do not appear in both the training and test sets.
 
-The evaluation is based on a held-out client-level test set. I report the resulting metrics in this report rather than presenting the results as a causal experiment. The analysis shows how well the ranking identifies pages associated with the declining label in the available data.
+The evaluation is based on a held-out client-level test set. I report the resulting metrics in this report rather than presenting the results as a causal experiment. The analysis is intended as a decision-support ranking tool for identifying pages associated with the declining label in the available data.
 
 ## 9. Acknowledgments & data credit
 
