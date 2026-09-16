@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Content Opportunity Scoring | Dhun Sehgal</title>
+    <title>Content Refresh Prioritization | Dhun Sehgal</title>
 
     <style>
         * {
@@ -215,11 +215,11 @@
     <div class="hero">
         <div class="tag">FlyRank ML Internship Capstone</div>
 
-        <h1>Refresh / Content Opportunity Scoring</h1>
+        <h1>Content Refresh Prioritization</h1>
 
         <p class="subtitle">
             Using observable content, visibility, freshness, and engagement signals
-            to rank pages for human review and possible content-refresh actions.
+            to prioritize pages for human review and possible content refresh.
         </p>
 
         <p class="author">
@@ -228,55 +228,61 @@
         </p>
     </div>
 
+
     <section>
         <h2>Abstract</h2>
 
         <p>
-            This capstone investigates whether observable content, visibility,
-            freshness, and engagement signals can be used to rank pages for human
-            review and possible content-refresh actions. The analysis uses 30,000
-            anonymized page-level records from the FlyRank ML Internship dataset
-            and excludes direct label-derived fields and identifiers from the
-            model features. A transparent baseline score is compared with a
-            Random Forest classifier using a client-level held-out test split to
-            reduce client-level leakage. The Random Forest achieved a Precision@50
-            of 0.6200 compared with 0.3200 for the baseline, corresponding to a
-            1.94× lift over the baseline, while the test-set declining base rate
-            was 51.10%. The resulting ranked output is intended as decision
-            support for editors, helping them prioritize pages for review rather
-            than automatically deciding that a page should be refreshed.
+            This project looks at whether observable content, visibility, freshness,
+            and engagement signals can help identify which pages should be reviewed
+            first for a possible content refresh. The analysis uses 30,000
+            anonymized page-level records and focuses on signals such as impressions,
+            search position, CTR, content age, and engagement. A simple baseline
+            ranking is compared with a Random Forest model using a client-level
+            held-out test split to reduce the risk of leakage between related pages.
+            The Random Forest reached a Precision@50 of 0.6200, compared with 0.3200
+            for the baseline, giving a 1.94× relative lift over the baseline.
+            The resulting ranking is intended to support editorial review rather
+            than automatically decide which pages should be changed.
         </p>
     </section>
+
 
     <section>
         <h2>1. Introduction / Problem Statement</h2>
 
         <p>
-            The main problem I wanted to work on was deciding which pages should
-            be looked at first when there are many pages that could potentially
-            need a content review or refresh.
+            When a website has a large number of pages, it can be difficult to
+            decide which pages should be checked first for a possible content
+            refresh. Some pages may still have good visibility but weak CTR, while
+            others may be older or show signs of declining performance.
         </p>
 
         <p>
-            The unit of analysis is a page. The output is a ranked list of pages
-            with a refresh-opportunity score and a reason for why the page may
-            deserve attention. A human editor can then use this ranking to decide
-            which pages to investigate first.
+            The goal of this project is to create a ranking that brings potentially
+            important pages to the top of the review list.
         </p>
 
         <p>
-            The cost of a wrong decision can work in both directions. Reviewing a
-            page that does not need attention can waste editorial time, while
-            missing a page that deserves review can mean missing an improvement
+            The unit of analysis is a page. The output is a ranked list with a
+            refresh-prioritization score, a reason, and a suggested action. A human
+            editor can use this ranking to decide which pages to investigate first.
+        </p>
+
+        <p>
+            There are two possible costs to getting the priority wrong. Reviewing a
+            page that does not need attention can use editorial time, while missing
+            a page that deserves review can mean missing a potential improvement
             opportunity.
         </p>
 
         <p>
-            I used multiple observable signals instead of relying on one metric.
-            Machine learning helps combine these signals into a consistent ranking
-            that can be used as a starting point for human review.
+            The approach combines several observable signals instead of relying on
+            a single metric. The resulting score is used as a starting point for
+            human review.
         </p>
     </section>
+
 
     <section>
         <h2>2. Data</h2>
@@ -301,8 +307,8 @@
         <p>
             This analysis uses the anonymized starter dataset
             <code>content_refresh_anonymized.csv</code>, containing 30,000
-            page-level records and 44 original columns. I used the page-level
-            starter dataset directly rather than querying the full warehouse
+            page-level records and 44 original columns. The page-level starter
+            dataset was used directly rather than querying the full warehouse
             release.
         </p>
 
@@ -318,9 +324,13 @@
             tables were directly queried for the final capstone model.
         </p>
 
-        <p>The final model features were:</p>
+        <p>
+            The final model uses 21 features covering search demand, content size,
+            visibility, freshness, CTR, position, engagement, and traffic signals.
+        </p>
 
         <p>
+            These include
             <code>search_volume</code>,
             <code>competition</code>,
             <code>cpc</code>,
@@ -347,51 +357,51 @@
         <h3>Data exclusions and leakage checks</h3>
 
         <p>
-            I excluded <code>trend_direction</code> because it was used to create
-            the target. I also excluded <code>trend_pct</code> because it contains
-            direct trend information. Using either of these as model features
-            could leak information about the outcome.
+            <code>trend_direction</code> was excluded because it was used to create
+            the target. <code>trend_pct</code> was also excluded because it contains
+            direct trend information. Using either field as a model feature could
+            leak information about the outcome.
         </p>
 
         <p>
             <code>content_id</code> was treated as an identifier and was not used
             as a feature. <code>client_id</code> was also not used as a feature;
-            it was used only for creating the client-level train/test split.
+            it was used only to create the client-level train/test split.
         </p>
 
         <p>
-            I also checked the train/test setup for client overlap. The final
-            split contained no clients shared between the training and test sets,
-            reducing the risk of client-level leakage.
+            The final split contained no clients shared between the training and
+            test sets, reducing the risk of client-level leakage.
         </p>
 
         <p>
-            The analysis does not report client names, domains, private queries,
-            credentials, or other client-identifying information.
+            No client names, domains, private queries, credentials, or other
+            client-identifying information are included in the analysis or paper.
         </p>
     </section>
+
 
     <section>
         <h2>3. Methodology</h2>
 
         <p>
-            I first created a simple rule-based baseline and then compared it
-            with a Random Forest model.
+            The analysis starts with a simple rule-based baseline and then compares
+            it with a Random Forest model.
         </p>
 
         <h3>Target</h3>
 
         <p>
-            A page was labelled as declining when
-            <code>trend_direction</code> was equal to <code>down</code>.
-            All other pages were treated as non-declining.
+            A page is labelled as declining when
+            <code>trend_direction</code> is equal to <code>down</code>.
+            All other pages are treated as non-declining.
         </p>
 
         <h3>Baseline</h3>
 
         <p>
             The baseline combines visibility, freshness, search position, and
-            content depth signals. The final score was calculated as:
+            content depth signals. The final score is:
         </p>
 
         <div class="note">
@@ -400,35 +410,35 @@
         </div>
 
         <p>
-            This gave a simple and interpretable ranking that could be understood
+            This provides a simple and transparent ranking that can be understood
             without a machine learning model.
         </p>
 
         <h3>Random Forest</h3>
 
         <p>
-            I used a Random Forest classifier with 300 trees,
-            <code>random_state=42</code>, and balanced class weights.
-            Numerical features were median-imputed and categorical features were
-            filled using the most frequent value and one-hot encoded.
+            A Random Forest classifier with 300 trees,
+            <code>random_state=42</code>, and balanced class weights was used.
+            Numerical features were median-imputed. Categorical features were
+            filled using the most frequent value and then one-hot encoded.
         </p>
 
         <h3>Validation design</h3>
 
         <p>
-            I used <code>GroupShuffleSplit</code> with
+            The evaluation uses <code>GroupShuffleSplit</code> with
             <code>test_size=0.20</code> and <code>random_state=42</code>.
-            The grouping variable was <code>client_id</code>, which means pages
-            from the same client were not placed in both the training and test
-            sets.
+            The grouping variable is <code>client_id</code>, so pages from the
+            same client are not placed in both the training and test sets.
         </p>
 
         <p>
-            The training set contained 23,837 pages from 25 clients, while the
-            held-out test set contained 6,163 pages from 7 clients. There was
-            zero client overlap between the two sets.
+            The training set contains 23,837 pages from 25 clients, while the
+            held-out test set contains 6,163 pages from 7 clients. There is zero
+            client overlap between the two sets.
         </p>
     </section>
+
 
     <section>
         <h2>4. Results</h2>
@@ -494,51 +504,55 @@
         </table>
 
         <p>
-            The held-out test set contained 6,163 pages from 7 clients, while the
-            training set contained 23,837 pages from 25 clients. There was zero
+            The held-out test set contains 6,163 pages from 7 clients, while the
+            training set contains 23,837 pages from 25 clients. There is zero
             client overlap between the two sets.
         </p>
 
         <p>
-            The declining base rate in the test set was 51.10%. This is important
-            because Precision@50 should be interpreted alongside the underlying
-            class rate rather than on its own.
+            The declining base rate in the test set is 51.10%. Precision@50 should
+            therefore be interpreted alongside the underlying class rate rather
+            than on its own.
         </p>
 
         <p>
-            The Random Forest placed 31 declining pages in its top 50 ranked
-            pages, compared with 16 for the baseline. The relative lift over the
-            baseline was 1.94×.
+            The Random Forest places 31 declining pages in its top 50 ranked pages,
+            compared with 16 for the baseline. This corresponds to a 1.94× relative
+            lift over the baseline.
         </p>
     </section>
+
 
     <section>
         <h2>5. Interpretation</h2>
 
         <p>
-            The feature-importance results showed that visibility, search
-            position, content age, content length, and click-through behaviour
-            were among the more informative signals in the model.
+            The feature-importance results show that visibility, search position,
+            content age, content length, and click-through behaviour were among
+            the more informative signals in the model.
         </p>
 
         <p>
-            Some of the stronger features included
-            <code>impressions_90d</code>, <code>avg_position</code>,
-            <code>content_age_days</code>, <code>char_count</code>,
-            <code>word_count</code>, and <code>ctr</code>.
+            Some of the stronger features include
+            <code>impressions_90d</code>,
+            <code>avg_position</code>,
+            <code>content_age_days</code>,
+            <code>char_count</code>,
+            <code>word_count</code>,
+            and <code>ctr</code>.
         </p>
 
         <p>
-            I also found that some simple relationships were weaker than I might
-            have expected. Word count and impressions had a weak positive
-            correlation of about 0.163. The relationship between average
-            position and CTR was also very weak, at about -0.073.
+            Some simple relationships were weaker than might be expected. Word
+            count and impressions had a weak positive correlation of about 0.163.
+            The relationship between average position and CTR was also very weak,
+            at about -0.073.
         </p>
 
         <p>
-            These results suggest that no single feature should be treated as
-            the explanation for decline. The model is combining several signals
-            to create the ranking.
+            These results suggest that no single feature should be treated as the
+            explanation for decline. The model combines several signals to create
+            the ranking.
         </p>
 
         <div class="note">
@@ -548,39 +562,40 @@
         </div>
     </section>
 
+
     <section>
         <h2>6. Limitations & Honest Framing</h2>
 
         <p>
-            There are several limitations to this analysis. The target is based
-            on the observed declining label, so the model is learning to identify
-            pages associated with that label rather than directly predicting the
-            effect of a future content refresh.
+            The main limitation is that the target represents an observed
+            declining label. The model therefore learns to identify pages
+            associated with that label rather than predicting what will happen
+            after a future content refresh.
         </p>
 
         <p>
-            The model also does not tell an editor exactly why a page declined.
-            A high ranking should therefore be treated as a reason to investigate
-            a page, not as proof that the page needs a specific change.
+            The model also does not explain exactly why a page declined. A
+            high-ranked page should therefore be treated as a page worth
+            investigating, not as proof that a specific change is needed.
         </p>
 
         <p>
-            Most importantly, this analysis is not a causal experiment. The
-            results cannot be used to claim that refreshing a page will improve
-            its future performance.
+            This analysis is not a causal experiment. The results cannot be used
+            to claim that refreshing a page will improve its future performance.
         </p>
 
         <p>
-            I therefore treat the results as directional and as decision support
+            The results are therefore best treated as directional decision support
             for prioritizing human review.
         </p>
     </section>
+
 
     <section>
         <h2>7. Ranked Recommendations</h2>
 
         <p>
-            I used the model ranking to create a simple action playbook for the
+            The model ranking was used to create a simple action playbook for the
             top 50 pages in the held-out test set.
         </p>
 
@@ -639,27 +654,29 @@
         </table>
 
         <p>
-            Pages with good visibility but relatively weak CTR can be checked
-            for possible title or snippet improvements. Pages showing declining
+            Pages with good visibility but relatively weak CTR can be checked for
+            possible title or snippet improvements. Pages showing declining
             signals together with enough visibility or demand can be considered
-            for a deeper content review. Pages without one obvious issue can
-            start with a general review.
+            for a deeper content review. Pages without one obvious issue can start
+            with a general review.
         </p>
 
         <p>
-            These actions are only a starting point. A human editor should review
-            the page and its context before making any change.
+            These actions are starting points for human review. The final action
+            should depend on the actual page, its intent, and the context behind
+            its performance.
         </p>
     </section>
+
 
     <section>
         <h2>8. Reproducibility</h2>
 
         <p>
-            I kept the main analysis in the capstone notebook so that the steps
-            can be followed and run again from the notebook. The complete
-            repository contains the supporting assignment work, the capstone
-            notebook, and the deployed paper.
+            The main analysis is available in the capstone notebook so that the
+            complete workflow can be followed and reproduced. The repository
+            contains the supporting assignment work, the capstone notebook, and
+            the deployed research paper.
         </p>
 
         <p>
@@ -702,19 +719,17 @@
 
         <p>
             The random seed is fixed at <code>42</code> for the train/test split
-            and the Random Forest model. I used a client-level split with
-            <code>GroupShuffleSplit</code>, so pages from the same client do not
-            appear in both the training and test sets.
+            and the Random Forest model. The evaluation uses a client-level
+            held-out test set with no client overlap between training and test.
         </p>
 
         <p>
-            The evaluation is based on a held-out client-level test set. I report
-            the resulting metrics in this paper rather than presenting the
-            results as a causal experiment. The analysis is intended as a
-            decision-support ranking tool for identifying pages associated with
-            the declining label in the available data.
+            The reported results are intended for decision support and should not
+            be interpreted as causal evidence about search-engine ranking or the
+            effect of making a content change.
         </p>
     </section>
+
 
     <section>
         <h2>9. Acknowledgments & Data Credit</h2>
@@ -732,8 +747,9 @@
         </p>
     </section>
 
+
     <div class="footer">
-        Dhun Sehgal · Refresh / Content Opportunity Scoring · September 2026
+        Dhun Sehgal · Content Refresh Prioritization · September 2026
     </div>
 
 </div>
