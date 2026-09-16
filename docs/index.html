@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Content Opportunity Scoring | Dhun Sehgal</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f7f8fa;
+            color: #202124;
+            line-height: 1.7;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: auto;
+            padding: 40px 24px 70px;
+        }
+
+        .hero {
+            background: white;
+            padding: 55px 50px;
+            border-radius: 18px;
+            margin-bottom: 28px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .tag {
+            display: inline-block;
+            background: #eef2ff;
+            color: #4338ca;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 18px;
+        }
+
+        h1 {
+            font-size: 42px;
+            line-height: 1.2;
+            margin: 0 0 18px;
+        }
+
+        h2 {
+            font-size: 27px;
+            margin-top: 0;
+            margin-bottom: 18px;
+        }
+
+        h3 {
+            margin-top: 28px;
+        }
+
+        .subtitle {
+            font-size: 19px;
+            color: #5f6368;
+            max-width: 800px;
+        }
+
+        .author {
+            margin-top: 25px;
+            color: #5f6368;
+        }
+
+        section {
+            background: white;
+            padding: 38px 42px;
+            border-radius: 18px;
+            margin-bottom: 24px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin: 25px 0;
+        }
+
+        .metric {
+            background: #f7f8fa;
+            padding: 22px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .metric-number {
+            font-size: 30px;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .metric-label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 22px 0;
+        }
+
+        th, td {
+            padding: 13px 15px;
+            border-bottom: 1px solid #e5e7eb;
+            text-align: left;
+        }
+
+        th {
+            background: #f7f8fa;
+            font-weight: 600;
+        }
+
+        .chart {
+            margin: 28px 0;
+        }
+
+        .bar-row {
+            display: grid;
+            grid-template-columns: 190px 1fr 70px;
+            align-items: center;
+            gap: 12px;
+            margin: 15px 0;
+        }
+
+        .bar-label {
+            font-size: 15px;
+        }
+
+        .bar-background {
+            height: 28px;
+            background: #edf0f2;
+            border-radius: 7px;
+            overflow: hidden;
+        }
+
+        .bar {
+            height: 100%;
+            background: #4f46e5;
+            border-radius: 7px;
+        }
+
+        .bar-value {
+            font-weight: 600;
+            text-align: right;
+        }
+
+        .note {
+            background: #f8fafc;
+            border-left: 4px solid #6366f1;
+            padding: 16px 20px;
+            margin: 22px 0;
+        }
+
+        code {
+            background: #f1f3f4;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.92em;
+        }
+
+        li {
+            margin-bottom: 9px;
+        }
+
+        a {
+            color: #4338ca;
+        }
+
+        .footer {
+            text-align: center;
+            color: #6b7280;
+            padding: 25px;
+        }
+
+        @media (max-width: 700px) {
+            .hero,
+            section {
+                padding: 28px 22px;
+            }
+
+            h1 {
+                font-size: 32px;
+            }
+
+            .metric-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .bar-row {
+                grid-template-columns: 1fr;
+                gap: 5px;
+            }
+
+            .bar-value {
+                text-align: left;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="hero">
+        <div class="tag">FlyRank ML Internship Capstone</div>
+
+        <h1>Refresh / Content Opportunity Scoring</h1>
+
+        <p class="subtitle">
+            Using observable content, visibility, freshness, and engagement signals
+            to rank pages for human review and possible content-refresh actions.
+        </p>
+
+        <p class="author">
+            <strong>Dhun Sehgal</strong><br>
+            Data Science | September 2026
+        </p>
+    </div>
+
+    <section>
+        <h2>Abstract</h2>
+
+        <p>
+            This capstone investigates whether observable content, visibility,
+            freshness, and engagement signals can be used to rank pages for human
+            review and possible content-refresh actions. The analysis uses 30,000
+            anonymized page-level records from the FlyRank ML Internship dataset
+            and excludes direct label-derived fields and identifiers from the
+            model features. A transparent baseline score is compared with a
+            Random Forest classifier using a client-level held-out test split to
+            reduce client-level leakage. The Random Forest achieved a Precision@50
+            of 0.6200 compared with 0.3200 for the baseline, corresponding to a
+            1.94× lift over the baseline, while the test-set declining base rate
+            was 51.10%. The resulting ranked output is intended as decision
+            support for editors, helping them prioritize pages for review rather
+            than automatically deciding that a page should be refreshed.
+        </p>
+    </section>
+
+    <section>
+        <h2>1. Introduction / Problem Statement</h2>
+
+        <p>
+            The main problem I wanted to work on was deciding which pages should
+            be looked at first when there are many pages that could potentially
+            need a content review or refresh.
+        </p>
+
+        <p>
+            The unit of analysis is a page. The output is a ranked list of pages
+            with a refresh-opportunity score and a reason for why the page may
+            deserve attention. A human editor can then use this ranking to decide
+            which pages to investigate first.
+        </p>
+
+        <p>
+            The cost of a wrong decision can work in both directions. Reviewing a
+            page that does not need attention can waste editorial time, while
+            missing a page that deserves review can mean missing an improvement
+            opportunity.
+        </p>
+
+        <p>
+            I used multiple observable signals instead of relying on one metric.
+            Machine learning helps combine these signals into a consistent ranking
+            that can be used as a starting point for human review.
+        </p>
+    </section>
+
+    <section>
+        <h2>2. Data</h2>
+
+        <div class="metric-grid">
+            <div class="metric">
+                <div class="metric-number">30,000</div>
+                <div class="metric-label">Page-level records</div>
+            </div>
+
+            <div class="metric">
+                <div class="metric-number">44</div>
+                <div class="metric-label">Original columns</div>
+            </div>
+
+            <div class="metric">
+                <div class="metric-number">21</div>
+                <div class="metric-label">Model features</div>
+            </div>
+        </div>
+
+        <p>
+            The analysis uses an anonymized FlyRank content-refresh dataset.
+            I used signals covering search demand, competition, content
+            characteristics, visibility, traffic, freshness, and engagement.
+        </p>
+
+        <p>The final model features were:</p>
+
+        <p>
+            <code>search_volume</code>,
+            <code>competition</code>,
+            <code>cpc</code>,
+            <code>word_count</code>,
+            <code>char_count</code>,
+            <code>impressions_90d</code>,
+            <code>clicks_90d</code>,
+            <code>pageviews_90d</code>,
+            <code>sessions_90d</code>,
+            <code>users_90d</code>,
+            <code>engaged_sessions_90d</code>,
+            <code>scroll_events_90d</code>,
+            <code>content_age_days</code>,
+            <code>days_since_last_update</code>,
+            <code>ctr</code>,
+            <code>avg_position</code>,
+            <code>engagement_rate</code>,
+            <code>scroll_rate</code>,
+            <code>ai_traffic_pct</code>,
+            <code>content_type</code>,
+            and <code>main_intent</code>.
+        </p>
+
+        <h3>Data exclusions and leakage checks</h3>
+
+        <p>
+            I excluded <code>trend_direction</code> because it was used to create
+            the target. I also excluded <code>trend_pct</code> because it contains
+            direct trend information. Using either of these as model features
+            could leak information about the outcome.
+        </p>
+
+        <p>
+            <code>content_id</code> was treated as an identifier and was not used
+            as a feature. <code>client_id</code> was also not used as a feature;
+            it was used only for creating the client-level train/test split.
+        </p>
+
+        <p>
+            The analysis does not report client names, private queries,
+            credentials, or other client-identifying information.
+        </p>
+    </section>
+
+    <section>
+        <h2>3. Methodology</h2>
+
+        <p>
+            I first created a simple rule-based baseline and then compared it
+            with a Random Forest model.
+        </p>
+
+        <h3>Target</h3>
+
+        <p>
+            A page was labelled as declining when
+            <code>trend_direction</code> was equal to <code>down</code>.
+            All other pages were treated as non-declining.
+        </p>
+
+        <h3>Baseline</h3>
+
+        <p>
+            The baseline combines visibility, freshness, search position, and
+            content depth signals. The final score was calculated as:
+        </p>
+
+        <div class="note">
+            0.40 × visibility + 0.30 × freshness +
+            0.25 × position + 0.05 × depth
+        </div>
+
+        <p>
+            This gave a simple and interpretable ranking that could be understood
+            without a machine learning model.
+        </p>
+
+        <h3>Random Forest</h3>
+
+        <p>
+            I used a Random Forest classifier with 300 trees,
+            <code>random_state=42</code>, and balanced class weights.
+            Numerical features were median-imputed and categorical features were
+            filled using the most frequent value and one-hot encoded.
+        </p>
+
+        <h3>Validation design</h3>
+
+        <p>
+            I used <code>GroupShuffleSplit</code> with
+            <code>test_size=0.20</code> and <code>random_state=42</code>.
+            The grouping variable was <code>client_id</code>, which means pages
+            from the same client were not placed in both the training and test
+            sets.
+        </p>
+    </section>
+
+    <section>
+        <h2>4. Results</h2>
+
+        <div class="metric-grid">
+            <div class="metric">
+                <div class="metric-number">32.00%</div>
+                <div class="metric-label">Baseline Precision@50</div>
+            </div>
+
+            <div class="metric">
+                <div class="metric-number">62.00%</div>
+                <div class="metric-label">Random Forest Precision@50</div>
+            </div>
+
+            <div class="metric">
+                <div class="metric-number">1.94×</div>
+                <div class="metric-label">Lift over baseline</div>
+            </div>
+        </div>
+
+        <h3>Model vs baseline</h3>
+
+        <div class="chart">
+
+            <div class="bar-row">
+                <div class="bar-label">Baseline</div>
+                <div class="bar-background">
+                    <div class="bar" style="width: 32%;"></div>
+                </div>
+                <div class="bar-value">32%</div>
+            </div>
+
+            <div class="bar-row">
+                <div class="bar-label">Random Forest</div>
+                <div class="bar-background">
+                    <div class="bar" style="width: 62%;"></div>
+                </div>
+                <div class="bar-value">62%</div>
+            </div>
+
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Method</th>
+                    <th>Precision@50</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr>
+                    <td>Transparent baseline</td>
+                    <td>0.3200</td>
+                </tr>
+
+                <tr>
+                    <td>Random Forest</td>
+                    <td>0.6200</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p>
+            The held-out test set contained 6,163 pages from 7 clients, while the
+            training set contained 23,837 pages from 25 clients. There was zero
+            client overlap between the two sets.
+        </p>
+
+        <p>
+            The declining base rate in the test set was 51.10%. This is important
+            because Precision@50 should be interpreted alongside the underlying
+            class rate rather than on its own.
+        </p>
+
+        <p>
+            The Random Forest placed 31 declining pages in its top 50 ranked
+            pages, compared with 16 for the baseline. The relative lift over the
+            baseline was 1.94×.
+        </p>
+    </section>
+
+    <section>
+        <h2>5. Interpretation</h2>
+
+        <p>
+            The feature-importance results showed that visibility, search
+            position, content age, content length, and click-through behaviour
+            were among the more informative signals in the model.
+        </p>
+
+        <p>
+            Some of the stronger features included
+            <code>impressions_90d</code>, <code>avg_position</code>,
+            <code>content_age_days</code>, <code>char_count</code>,
+            <code>word_count</code>, and <code>ctr</code>.
+        </p>
+
+        <p>
+            I also found that some simple relationships were weaker than I might
+            have expected. Word count and impressions had a weak positive
+            correlation of about 0.163. The relationship between average
+            position and CTR was also very weak, at about -0.073.
+        </p>
+
+        <p>
+            These results suggest that no single feature should be treated as
+            the explanation for decline. The model is combining several signals
+            to create the ranking.
+        </p>
+
+        <div class="note">
+            Feature importance shows which signals were useful to the model. It
+            does not show that changing a particular feature will cause a page's
+            performance to improve.
+        </div>
+    </section>
+
+    <section>
+        <h2>6. Limitations & Honest Framing</h2>
+
+        <p>
+            There are several limitations to this analysis. The target is based
+            on the observed declining label, so the model is learning to identify
+            pages associated with that label rather than directly predicting the
+            effect of a future content refresh.
+        </p>
+
+        <p>
+            The model also does not tell an editor exactly why a page declined.
+            A high ranking should therefore be treated as a reason to investigate
+            a page, not as proof that the page needs a specific change.
+        </p>
+
+        <p>
+            Most importantly, this analysis is not a causal experiment. The
+            results cannot be used to claim that refreshing a page will improve
+            its future performance.
+        </p>
+
+        <p>
+            I therefore treat the results as directional and as decision support
+            for prioritizing human review.
+        </p>
+    </section>
+
+    <section>
+        <h2>7. Ranked Recommendations</h2>
+
+        <p>
+            I used the model ranking to create a simple action playbook for the
+            top 50 pages in the held-out test set.
+        </p>
+
+        <div class="chart">
+
+            <div class="bar-row">
+                <div class="bar-label">Title/snippet + CTR</div>
+                <div class="bar-background">
+                    <div class="bar" style="width: 100%;"></div>
+                </div>
+                <div class="bar-value">29</div>
+            </div>
+
+            <div class="bar-row">
+                <div class="bar-label">General review</div>
+                <div class="bar-background">
+                    <div class="bar" style="width: 45%;"></div>
+                </div>
+                <div class="bar-value">13</div>
+            </div>
+
+            <div class="bar-row">
+                <div class="bar-label">Content refresh</div>
+                <div class="bar-background">
+                    <div class="bar" style="width: 28%;"></div>
+                </div>
+                <div class="bar-value">8</div>
+            </div>
+
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Recommended action</th>
+                    <th>Pages in top 50</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr>
+                    <td>Review title/snippet and CTR</td>
+                    <td>29</td>
+                </tr>
+
+                <tr>
+                    <td>General content review</td>
+                    <td>13</td>
+                </tr>
+
+                <tr>
+                    <td>Review for content refresh</td>
+                    <td>8</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p>
+            Pages with good visibility but relatively weak CTR can be checked
+            for possible title or snippet improvements. Pages showing declining
+            signals together with enough visibility or demand can be considered
+            for a deeper content review. Pages without one obvious issue can
+            start with a general review.
+        </p>
+
+        <p>
+            These actions are only a starting point. A human editor should review
+            the page and its context before making any change.
+        </p>
+    </section>
+
+    <section>
+        <h2>8. Reproducibility</h2>
+
+        <p>
+            The complete analysis is available in the capstone notebook in the
+            repository.
+        </p>
+
+        <ol>
+            <li>Clone the repository.</li>
+            <li>Open <code>work/notebooks/capstone.ipynb</code>.</li>
+            <li>Make sure the FlyRank dataset is available at the expected data path.</li>
+            <li>Run the notebook from top to bottom.</li>
+            <li>The notebook loads the data, creates the target, checks leakage, builds the baseline, trains the Random Forest, evaluates both methods, and creates the ranked recommendations.</li>
+        </ol>
+
+        <p>
+            The analysis uses <code>random_state=42</code> for the split and the
+            Random Forest model. The main libraries used include pandas, numpy,
+            scikit-learn, matplotlib, and seaborn.
+        </p>
+
+        <p>
+            The repository also contains the earlier assignment notebooks that
+            were used to build the capstone step by step.
+        </p>
+
+        <p>
+            <a href="https://github.com/24f2001824/ml-flyrank">
+                View the GitHub repository and notebooks
+            </a>
+        </p>
+    </section>
+
+    <section>
+        <h2>9. Acknowledgments & Data Credit</h2>
+
+        <p>
+            This project was completed as part of the FlyRank ML Internship and
+            uses the FlyRank ML Internship dataset.
+        </p>
+
+        <p>
+            Built on the
+            <a href="https://flyrank.ai">
+                FlyRank ML Internship dataset
+            </a>.
+        </p>
+    </section>
+
+    <div class="footer">
+        Dhun Sehgal · Refresh / Content Opportunity Scoring · September 2026
+    </div>
+
+</div>
+
+</body>
+</html>
