@@ -17,3 +17,22 @@ The unit of analysis is a page. The output is a ranked list of pages with a refr
 The cost of a wrong call is asymmetric. Prioritizing a page that does not need attention can waste editorial time, while failing to prioritize a page that warrants review can result in a missed improvement opportunity.
 
 Data and machine learning are useful because the dataset contains multiple observable signals related to visibility, content characteristics, freshness, and engagement. Combining these signals into a ranking can provide a consistent decision-support tool rather than relying only on a single manually selected rule.
+## 2. Data safety
+
+The analysis uses an anonymized FlyRank content-refresh dataset containing 30,000 page-level records and 44 original columns. The unit of analysis is a page, and the model uses observable content, visibility, freshness, and engagement signals.
+
+The final model uses 21 features:
+
+- Search and competition: `search_volume`, `competition`, `cpc`
+- Content characteristics: `word_count`, `char_count`, `content_type`, `main_intent`
+- Visibility and traffic: `impressions_90d`, `clicks_90d`, `pageviews_90d`, `sessions_90d`, `users_90d`, `engaged_sessions_90d`, `scroll_events_90d`
+- Freshness: `content_age_days`, `days_since_last_update`
+- Performance and engagement: `ctr`, `avg_position`, `engagement_rate`, `scroll_rate`, `ai_traffic_pct`
+
+Several columns were deliberately excluded from the model. `trend_direction` was used to define the declining target and was therefore excluded to prevent direct target leakage. `trend_pct` was also excluded because it directly represents trend information and could reveal the outcome being predicted. `content_id` was excluded because it is an identifier rather than a predictive feature. `client_id` was excluded from the model features and used only for grouped train/test splitting so that pages from the same client would not appear in both sets.
+
+Other derived tier fields and fields not required for the final feature set were also not used as model inputs.
+
+The target is a binary proxy for content decline: a page is labelled as declining when `trend_direction` is equal to `down`, and non-declining otherwise.
+
+The analysis is intended to remain public-safe. It does not use client names, private queries, credentials, or client-identifying information as model inputs or reported recommendations.
