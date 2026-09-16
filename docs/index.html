@@ -299,9 +299,23 @@
         </div>
 
         <p>
-            The analysis uses an anonymized FlyRank content-refresh dataset.
-            I used signals covering search demand, competition, content
-            characteristics, visibility, traffic, freshness, and engagement.
+            This analysis uses the anonymized starter dataset
+            <code>content_refresh_anonymized.csv</code>, containing 30,000
+            page-level records and 44 original columns. I used the page-level
+            starter dataset directly rather than querying the full warehouse
+            release.
+        </p>
+
+        <p>
+            The dataset provides observable signals covering search demand,
+            competition, content characteristics, visibility, traffic, freshness,
+            and engagement. The performance features include 90-day and 30-day
+            aggregate windows.
+        </p>
+
+        <p>
+            The analysis uses the page-level CSV as its data table. No warehouse
+            tables were directly queried for the final capstone model.
         </p>
 
         <p>The final model features were:</p>
@@ -346,7 +360,13 @@
         </p>
 
         <p>
-            The analysis does not report client names, private queries,
+            I also checked the train/test setup for client overlap. The final
+            split contained no clients shared between the training and test sets,
+            reducing the risk of client-level leakage.
+        </p>
+
+        <p>
+            The analysis does not report client names, domains, private queries,
             credentials, or other client-identifying information.
         </p>
     </section>
@@ -401,6 +421,12 @@
             The grouping variable was <code>client_id</code>, which means pages
             from the same client were not placed in both the training and test
             sets.
+        </p>
+
+        <p>
+            The training set contained 23,837 pages from 25 clients, while the
+            held-out test set contained 6,163 pages from 7 clients. There was
+            zero client overlap between the two sets.
         </p>
     </section>
 
@@ -630,33 +656,63 @@
         <h2>8. Reproducibility</h2>
 
         <p>
-            The complete analysis is available in the capstone notebook in the
-            repository.
+            I kept the main analysis in the capstone notebook so that the steps
+            can be followed and run again from the notebook. The complete
+            repository contains the supporting assignment work, the capstone
+            notebook, and the deployed paper.
+        </p>
+
+        <p>
+            <strong>Repository:</strong>
+            <a href="https://github.com/24f2001824/ml-flyrank">
+                https://github.com/24f2001824/ml-flyrank
+            </a>
+        </p>
+
+        <p>
+            <strong>Capstone notebook:</strong>
+            <a href="https://github.com/24f2001824/ml-flyrank/blob/main/work/notebooks/capstone.ipynb">
+                work/notebooks/capstone.ipynb
+            </a>
+        </p>
+
+        <p>
+            The main steps to reproduce the analysis are:
         </p>
 
         <ol>
             <li>Clone the repository.</li>
             <li>Open <code>work/notebooks/capstone.ipynb</code>.</li>
-            <li>Make sure the FlyRank dataset is available at the expected data path.</li>
+            <li>
+                Make sure the anonymized FlyRank dataset is available at
+                <code>data/raw/content_refresh_anonymized.csv</code>.
+            </li>
             <li>Run the notebook from top to bottom.</li>
-            <li>The notebook loads the data, creates the target, checks leakage, builds the baseline, trains the Random Forest, evaluates both methods, and creates the ranked recommendations.</li>
+            <li>
+                The notebook loads the data, creates the target, checks for
+                leakage, creates the baseline, trains the Random Forest model,
+                evaluates both methods, and generates the ranked recommendations.
+            </li>
         </ol>
 
         <p>
-            The analysis uses <code>random_state=42</code> for the split and the
-            Random Forest model. The main libraries used include pandas, numpy,
-            scikit-learn, matplotlib, and seaborn.
+            The main Python libraries used include pandas, numpy, scikit-learn,
+            matplotlib, and seaborn.
         </p>
 
         <p>
-            The repository also contains the earlier assignment notebooks that
-            were used to build the capstone step by step.
+            The random seed is fixed at <code>42</code> for the train/test split
+            and the Random Forest model. I used a client-level split with
+            <code>GroupShuffleSplit</code>, so pages from the same client do not
+            appear in both the training and test sets.
         </p>
 
         <p>
-            <a href="https://github.com/24f2001824/ml-flyrank">
-                View the GitHub repository and notebooks
-            </a>
+            The evaluation is based on a held-out client-level test set. I report
+            the resulting metrics in this paper rather than presenting the
+            results as a causal experiment. The analysis is intended as a
+            decision-support ranking tool for identifying pages associated with
+            the declining label in the available data.
         </p>
     </section>
 
